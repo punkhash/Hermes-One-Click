@@ -1,0 +1,23 @@
+{
+  "name": "Cosmius Hermes",
+  "short_name": "Cosmius Hermes",
+  "description": "Cosmius Hermes AI Agent Web UI",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F9F9F9",
+  "theme_color": "#FFFFFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "static/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "static/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

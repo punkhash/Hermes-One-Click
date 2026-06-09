@@ -1,0 +1,7 @@
+python312.zip
+.
+..\..\app\hermes-webui
+..\..\app\hermes-agent
+Lib\site-packages
+..\..\tools\bin
+import site

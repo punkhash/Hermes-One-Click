@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Kyvolen Token">
+  <rect width="64" height="64" rx="8" fill="#fff"/>
+  <path fill="#2F80ED" d="M8 8h15.4l12.2 12.2-9.9 9.9L8 12.4z"/>
+  <path fill="#EB5757" d="M40.6 8H56v15.4L43.7 35.7l-9.9-9.9z"/>
+  <path fill="#27AE60" d="M20.3 34.4 30 44.1 18.1 56H8V45.9z"/>
+  <path fill="#2F80ED" d="m44.1 39.7 11.7 11.7-7.4 7.4-11.7-11.7z"/>
+  <path fill="#EB5757" d="m31.9 20.8 11.3 11.3-5.8 5.8-11.3-11.3z"/>
+</svg>

@@ -1,50 +1,30 @@
-# Build outputs
-_staging/
-_dist/
-build-output/
-dist/
-out/
-*.exe
-*.msix
-*.msi
-*.zip
-*.cab
-*.tar.gz
+# User data and chat history
+chat_history/
+conversations/
+user_data/
+history/
+/data/
 
-# Downloaded runtimes and local tool cache
-vendor/
-
-# JavaScript / Node
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-
-# Python
-.venv/
-venv/
-env/
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-# Local app state and secrets
+# Local secrets and machine-specific config
 .env
 .env.*
 !.env.example
+!.env.*.example
+*.key
+config.local.json
 *.log
-logs/
 
-# IDE / editor
-.idea/
-.vscode/
-.cursor/
+# Runtime caches and temporary files
+__pycache__/
+runtime/temp/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
+# Keep bundled dependency source directories that are not user chat data.
+!runtime/python/Lib/site-packages/openai/resources/conversations/
+!runtime/python/Lib/site-packages/openai/resources/conversations/**
+!runtime/python/Lib/site-packages/openai/types/conversations/
+!runtime/python/Lib/site-packages/openai/types/conversations/**
