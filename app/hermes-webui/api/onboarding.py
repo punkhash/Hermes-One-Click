@@ -34,18 +34,6 @@ from api.workspace import get_last_workspace, load_workspaces
 logger = logging.getLogger(__name__)
 
 
-def _get_active_env_path() -> Path:
-    try:
-        from api.profiles import get_active_hermes_home, get_env_path_for_home
-
-        return get_env_path_for_home(get_active_hermes_home())
-    except Exception:
-        override = os.getenv("HERMES_ENV_PATH", "").strip()
-        if override:
-            return Path(override).expanduser()
-        return Path.home() / ".hermes" / ".env"
-
-
 _SUPPORTED_PROVIDER_SETUPS = {
     # ── Easy start ──────────────────────────────────────────────────────
     "openrouter": {
@@ -266,7 +254,7 @@ def _reset_quick_setup_env_files() -> None:
     for env_var in env_vars:
         updates[env_var] = None
 
-    _write_env_file(_get_active_env_path(), updates)
+    _write_env_file(_get_active_hermes_home() / ".env", updates)
 
     # Best-effort mirror for packaged installs that expose an install-root .env.
     try:
@@ -453,7 +441,7 @@ def _status_from_runtime(cfg: dict, imports_ok: bool) -> dict:
     provider = _extract_current_provider(cfg)
     model = _extract_current_model(cfg)
     base_url = _extract_current_base_url(cfg)
-    env_values = _load_env_file(_get_active_env_path())
+    env_values = _load_env_file(_get_active_hermes_home() / ".env")
 
     provider_configured = bool(provider and model)
     provider_ready = False
@@ -521,7 +509,7 @@ def _status_from_runtime(cfg: dict, imports_ok: bool) -> dict:
         "current_provider": provider or None,
         "current_model": model or None,
         "current_base_url": base_url or None,
-        "env_path": str(_get_active_env_path()),
+        "env_path": str(_get_active_hermes_home() / ".env"),
     }
 
 
@@ -736,7 +724,7 @@ def apply_onboarding_setup(body: dict) -> dict:
         }
 
     cfg = _load_yaml_config(config_path)
-    env_path = _get_active_env_path()
+    env_path = _get_active_hermes_home() / ".env"
     env_values = _load_env_file(env_path)
 
     if not api_key and not _provider_api_key_present(provider, cfg, env_values):

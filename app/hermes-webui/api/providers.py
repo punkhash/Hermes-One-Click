@@ -91,18 +91,6 @@ def _get_hermes_home() -> Path:
         return Path.home() / ".hermes"
 
 
-def _get_active_env_path() -> Path:
-    try:
-        from api.profiles import get_env_path_for_home
-
-        return get_env_path_for_home(_get_hermes_home())
-    except ImportError:
-        override = os.getenv("HERMES_ENV_PATH", "").strip()
-        if override:
-            return Path(override).expanduser()
-        return Path.home() / ".hermes" / ".env"
-
-
 def _load_env_file(env_path: Path) -> dict[str, str]:
     """Read key=value pairs from a .env file."""
     values: dict[str, str] = {}
@@ -289,7 +277,7 @@ def _provider_has_key(provider_id: str) -> bool:
     """
     env_var = _PROVIDER_ENV_VAR.get(provider_id)
     if env_var:
-        env_path = _get_active_env_path()
+        env_path = _get_hermes_home() / ".env"
         env_values = _load_env_file(env_path)
         if env_values.get(env_var):
             return True
@@ -430,7 +418,7 @@ def get_providers() -> dict[str, Any]:
         elif has_key:
             env_var = _PROVIDER_ENV_VAR.get(pid)
             if env_var:
-                env_path = _get_active_env_path()
+                env_path = _get_hermes_home() / ".env"
                 env_values = _load_env_file(env_path)
                 if env_values.get(env_var):
                     key_source = "env_file"
@@ -576,7 +564,7 @@ def set_provider_key(
             if len(api_key) < 8:
                 return {"ok": False, "error": "API key appears too short."}
 
-        env_path = _get_active_env_path()
+        env_path = _get_hermes_home() / ".env"
         try:
             _write_env_file(
                 env_path,
@@ -603,7 +591,7 @@ def set_provider_key(
         try:
             _save_provider_base_url(provider_id, base_url)
             _write_env_file(
-                _get_active_env_path(),
+                _get_hermes_home() / ".env",
                 _provider_runtime_env_updates(base_url=base_url, default_model=DEFAULT_MODEL),
             )
             sync_install_env_file(base_url=base_url, default_model=DEFAULT_MODEL)

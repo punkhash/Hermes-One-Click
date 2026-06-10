@@ -17,36 +17,6 @@ _HERMES_HOME_OVERRIDE: ContextVar[str | object] = ContextVar(
 )
 
 
-def get_cosmius_appdata_root() -> Path | None:
-    """Return the Windows AppData root for Cosmius Hermes, when available."""
-    if os.name != "nt":
-        return None
-    raw = os.environ.get("APPDATA", "").strip()
-    if not raw:
-        userprofile = os.environ.get("USERPROFILE", "").strip()
-        if userprofile:
-            raw = str(Path(userprofile) / "AppData" / "Roaming")
-    if not raw:
-        return None
-    return Path(raw) / "CosmiusHermes"
-
-
-def get_default_hermes_home_path() -> Path:
-    """Return the default Hermes data directory for this platform."""
-    appdata_root = get_cosmius_appdata_root()
-    if appdata_root is not None:
-        return appdata_root / "data"
-    return Path.home() / ".hermes"
-
-
-def get_default_hermes_config_dir() -> Path:
-    """Return the default Cosmius Hermes config directory."""
-    appdata_root = get_cosmius_appdata_root()
-    if appdata_root is not None:
-        return appdata_root / "config"
-    return get_default_hermes_home_path()
-
-
 def set_hermes_home_override(path: str | Path | None) -> Token:
     """Set a context-local Hermes home override and return its reset token.
 
@@ -102,7 +72,7 @@ def get_hermes_home() -> Path:
             # Inline the default-root resolution from get_default_hermes_root()
             # to stay import-safe (this function is called from module scope
             # in 30+ files; we cannot afford to trigger logging setup here).
-            active_path = get_default_hermes_home_path() / "active_profile"
+            active_path = (Path.home() / ".hermes" / "active_profile")
             active = active_path.read_text().strip() if active_path.exists() else ""
         except (UnicodeDecodeError, OSError):
             active = ""
@@ -128,7 +98,7 @@ def get_hermes_home() -> Path:
             except Exception:
                 pass
 
-    return get_default_hermes_home_path()
+    return Path.home() / ".hermes"
 
 
 def get_default_hermes_root() -> Path:
@@ -147,7 +117,7 @@ def get_default_hermes_root() -> Path:
 
     Import-safe — no dependencies beyond stdlib.
     """
-    native_home = get_default_hermes_home_path()
+    native_home = Path.home() / ".hermes"
     env_home = os.environ.get("HERMES_HOME", "")
     if not env_home:
         return native_home
@@ -433,10 +403,7 @@ def get_skills_dir() -> Path:
 
 def get_env_path() -> Path:
     """Return the path to the ``.env`` file under HERMES_HOME."""
-    override = os.environ.get("HERMES_ENV_PATH", "").strip()
-    if override:
-        return Path(override).expanduser()
-    return get_default_hermes_config_dir() / ".env"
+    return get_hermes_home() / ".env"
 
 
 # ─── Network Preferences ─────────────────────────────────────────────────────

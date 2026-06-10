@@ -21,33 +21,6 @@ INSTALLER_URL = "https://raw.githubusercontent.com/NousResearch/hermes-agent/mai
 REPO_ROOT = Path(__file__).resolve().parent
 
 
-def _cosmius_appdata_root() -> Path | None:
-    if os.name != "nt":
-        return None
-    raw = os.getenv("APPDATA", "").strip()
-    if not raw:
-        userprofile = os.getenv("USERPROFILE", "").strip()
-        if userprofile:
-            raw = str(Path(userprofile) / "AppData" / "Roaming")
-    if not raw:
-        return None
-    return Path(raw) / "CosmiusHermes"
-
-
-def _default_hermes_home() -> Path:
-    appdata_root = _cosmius_appdata_root()
-    if appdata_root is not None:
-        return appdata_root / "data"
-    return Path.home() / ".hermes"
-
-
-def _default_webui_state_dir() -> Path:
-    appdata_root = _cosmius_appdata_root()
-    if appdata_root is not None:
-        return appdata_root / "data" / "webui"
-    return Path.home() / ".hermes" / "webui"
-
-
 def _load_repo_dotenv() -> None:
     """Load REPO_ROOT/.env into os.environ.
 
@@ -118,7 +91,7 @@ def ensure_supported_platform() -> None:
 
 
 def discover_agent_dir() -> Path | None:
-    home = Path(os.getenv("HERMES_HOME", str(_default_hermes_home()))).expanduser()
+    home = Path(os.getenv("HERMES_HOME", str(Path.home() / ".hermes"))).expanduser()
     candidates = [
         os.getenv("HERMES_WEBUI_AGENT_DIR", ""),
         str(home / "hermes-agent"),
@@ -253,20 +226,14 @@ def main() -> int:
 
     python_exe = ensure_python_has_webui_deps(discover_launcher_python(agent_dir))
     state_dir = Path(
-        os.getenv("HERMES_WEBUI_STATE_DIR", str(_default_webui_state_dir()))
+        os.getenv("HERMES_WEBUI_STATE_DIR", str(Path.home() / ".hermes" / "webui"))
     ).expanduser()
     state_dir.mkdir(parents=True, exist_ok=True)
-    config_dir = (_cosmius_appdata_root() / "config") if _cosmius_appdata_root() else _default_hermes_home()
-    config_dir.mkdir(parents=True, exist_ok=True)
     log_path = state_dir / f"bootstrap-{args.port}.log"
 
     env = os.environ.copy()
     env["HERMES_WEBUI_HOST"] = args.host
     env["HERMES_WEBUI_PORT"] = str(args.port)
-    env.setdefault("HERMES_BASE_HOME", str(_default_hermes_home()))
-    env.setdefault("HERMES_HOME", str(_default_hermes_home()))
-    env.setdefault("HERMES_ENV_PATH", str(config_dir / ".env"))
-    env.setdefault("HERMES_INSTALL_ENV_FILE", str(config_dir / ".env"))
     env.setdefault("HERMES_WEBUI_STATE_DIR", str(state_dir))
     if agent_dir:
         env["HERMES_WEBUI_AGENT_DIR"] = str(agent_dir)

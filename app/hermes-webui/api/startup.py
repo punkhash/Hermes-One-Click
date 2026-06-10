@@ -34,13 +34,10 @@ def fix_credential_permissions() -> None:
             pass
 
     hermes_home = Path(os.environ.get('HERMES_HOME', str(Path.home() / '.hermes')))
-    sensitive_paths = []
-    if hermes_home.is_dir():
-        sensitive_paths.extend(hermes_home / name for name in _SENSITIVE_FILES)
-    env_override = os.environ.get('HERMES_ENV_PATH', '').strip()
-    if env_override:
-        sensitive_paths.append(Path(env_override).expanduser())
-    for fpath in sensitive_paths:
+    if not hermes_home.is_dir():
+        return
+    for name in _SENSITIVE_FILES:
+        fpath = hermes_home / name
         if not fpath.exists():
             continue
         try:

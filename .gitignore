@@ -17,6 +17,8 @@ config.local.json
 # Runtime caches and temporary files
 __pycache__/
 runtime/temp/
+dist/
+installer/work/
 *.db
 *.db-*
 *.sqlite

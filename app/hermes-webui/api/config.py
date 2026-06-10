@@ -27,26 +27,6 @@ HOME = Path.home()
 # REPO_ROOT is the directory that contains this file's parent (api/ -> repo root)
 REPO_ROOT = Path(__file__).parent.parent.resolve()
 
-
-def _cosmius_appdata_root() -> Path | None:
-    if os.name != "nt":
-        return None
-    raw = os.getenv("APPDATA", "").strip()
-    if not raw:
-        userprofile = os.getenv("USERPROFILE", "").strip()
-        if userprofile:
-            raw = str(Path(userprofile) / "AppData" / "Roaming")
-    if not raw:
-        return None
-    return Path(raw) / "CosmiusHermes"
-
-
-def _default_state_dir() -> Path:
-    appdata_root = _cosmius_appdata_root()
-    if appdata_root is not None:
-        return appdata_root / "data" / "webui"
-    return HOME / ".hermes" / "webui"
-
 # ── Network config (env-overridable) ─────────────────────────────────────────
 HOST = os.getenv("HERMES_WEBUI_HOST", "127.0.0.1")
 PORT = int(os.getenv("HERMES_WEBUI_PORT", "8787"))
@@ -58,7 +38,7 @@ TLS_ENABLED = TLS_CERT is not None and TLS_KEY is not None
 
 # ── State directory (env-overridable, never inside repo) ──────────────────────
 STATE_DIR = (
-    Path(os.getenv("HERMES_WEBUI_STATE_DIR", str(_default_state_dir())))
+    Path(os.getenv("HERMES_WEBUI_STATE_DIR", str(HOME / ".hermes" / "webui")))
     .expanduser()
     .resolve()
 )
@@ -1785,16 +1765,10 @@ def get_available_models() -> dict:
         if not _hermes_auth_used:
             try:
                 from api.profiles import get_active_hermes_home as _gah2
-                from api.profiles import get_env_path_for_home as _gepfh
 
-                hermes_env_path = _gepfh(_gah2())
+                hermes_env_path = _gah2() / ".env"
             except ImportError:
-                env_override = os.getenv("HERMES_ENV_PATH", "").strip()
-                hermes_env_path = (
-                    Path(env_override).expanduser()
-                    if env_override
-                    else HOME / ".hermes" / ".env"
-                )
+                hermes_env_path = HOME / ".hermes" / ".env"
             env_keys = {}
             if hermes_env_path.exists():
                 try:

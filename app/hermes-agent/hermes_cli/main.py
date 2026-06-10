@@ -2165,23 +2165,10 @@ def _try_launch_packaged_model_config() -> bool:
         if not launcher.exists():
             continue
         env = os.environ.copy()
-        appdata = env.get("APPDATA") or (
-            str(Path(env["USERPROFILE"]) / "AppData" / "Roaming")
-            if env.get("USERPROFILE")
-            else ""
-        )
-        cosmius_appdata = Path(appdata) / "CosmiusHermes" if appdata else root / "data"
-        cosmius_data = cosmius_appdata / "data"
-        cosmius_config = cosmius_appdata / "config"
-        cosmius_data.mkdir(parents=True, exist_ok=True)
-        cosmius_config.mkdir(parents=True, exist_ok=True)
-        (cosmius_data / "webui").mkdir(parents=True, exist_ok=True)
         env.setdefault("HERMES_INSTALL_ROOT", str(root))
-        env.setdefault("HERMES_INSTALL_ENV_FILE", str(cosmius_config / ".env"))
-        env.setdefault("HERMES_ENV_PATH", str(cosmius_config / ".env"))
-        env.setdefault("HERMES_BASE_HOME", str(cosmius_data))
-        env.setdefault("HERMES_HOME", str(cosmius_data))
-        env.setdefault("HERMES_WEBUI_STATE_DIR", str(cosmius_data / "webui"))
+        env.setdefault("HERMES_INSTALL_ENV_FILE", str(root / ".env"))
+        env.setdefault("HERMES_HOME", str(root / "data" / ".hermes"))
+        env.setdefault("HERMES_WEBUI_STATE_DIR", str(root / "data" / "webui"))
         try:
             flags = getattr(subprocess, "DETACHED_PROCESS", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
             subprocess.Popen(

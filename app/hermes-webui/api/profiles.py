@@ -156,26 +156,6 @@ def get_hermes_home_for_profile(name: str) -> Path:
     return profile_dir
 
 
-def get_env_path_for_home(home: Path | str | None = None) -> Path:
-    """Return the .env path for a profile home.
-
-    Packaged Windows builds keep the default profile's .env in
-    %APPDATA%/CosmiusHermes/config while all runtime data stays under
-    %APPDATA%/CosmiusHermes/data. Named profiles keep their own .env under
-    the profile directory for isolation.
-    """
-    target = Path(home).expanduser() if home is not None else get_active_hermes_home()
-    override = os.getenv('HERMES_ENV_PATH', '').strip()
-    if override:
-        try:
-            if target.resolve() == _DEFAULT_HERMES_HOME.expanduser().resolve():
-                return Path(override).expanduser()
-        except OSError:
-            if str(target) == str(_DEFAULT_HERMES_HOME):
-                return Path(override).expanduser()
-    return target / '.env'
-
-
 _TERMINAL_ENV_MAPPINGS = {
     'backend': 'TERMINAL_ENV',
     'env_type': 'TERMINAL_ENV',
@@ -242,7 +222,7 @@ def get_profile_runtime_env(home: Path) -> dict[str, str]:
             if key in terminal_cfg and terminal_cfg[key] is not None:
                 env[env_key] = _stringify_env_value(terminal_cfg[key])
 
-    env_path = get_env_path_for_home(home)
+    env_path = home / '.env'
     if env_path.exists():
         try:
             for line in env_path.read_text(encoding='utf-8').splitlines():
@@ -304,7 +284,7 @@ def _reload_dotenv(home: Path):
         os.environ.pop(key, None)
     _loaded_profile_env_keys = set()
 
-    env_path = get_env_path_for_home(home)
+    env_path = home / '.env'
     if not env_path.exists():
         return
     try:
@@ -333,8 +313,6 @@ def init_profile_state() -> None:
     global _active_profile
     _active_profile = _read_active_profile_file()
     home = get_active_hermes_home()
-    home.mkdir(parents=True, exist_ok=True)
-    get_env_path_for_home(home).parent.mkdir(parents=True, exist_ok=True)
     _set_hermes_home(home)
     _reload_dotenv(home)
 
@@ -507,7 +485,7 @@ def _default_profile_dict() -> dict:
         'gateway_running': False,
         'model': None,
         'provider': None,
-        'has_env': get_env_path_for_home(_DEFAULT_HERMES_HOME).exists(),
+        'has_env': (_DEFAULT_HERMES_HOME / '.env').exists(),
         'skill_count': 0,
     }
 

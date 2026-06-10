@@ -493,17 +493,6 @@ def get_config_path() -> Path:
 
 def get_env_path() -> Path:
     """Get the .env file path (for API keys)."""
-    override = os.environ.get("HERMES_ENV_PATH", "").strip()
-    if override:
-        return Path(override).expanduser()
-    if os.name == "nt":
-        raw = os.environ.get("APPDATA", "").strip()
-        if not raw:
-            userprofile = os.environ.get("USERPROFILE", "").strip()
-            if userprofile:
-                raw = str(Path(userprofile) / "AppData" / "Roaming")
-        if raw:
-            return Path(raw) / "CosmiusHermes" / "config" / ".env"
     return get_hermes_home() / ".env"
 
 def get_project_root() -> Path:

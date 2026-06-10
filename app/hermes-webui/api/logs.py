@@ -216,9 +216,9 @@ def build_log_export_zip() -> tuple[bytes, str]:
         _add_file(zf, _get_config_path(), "hermes/config.yaml")
 
         try:
-            from api.profiles import get_active_hermes_home, get_env_path_for_home
+            from api.profiles import get_active_hermes_home
 
-            _add_file(zf, get_env_path_for_home(get_active_hermes_home()), "hermes/env.redacted")
+            _add_file(zf, get_active_hermes_home() / ".env", "hermes/env.redacted")
         except Exception:
             pass
 

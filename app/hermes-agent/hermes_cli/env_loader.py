@@ -225,18 +225,7 @@ def load_hermes_dotenv(
     loaded: list[Path] = []
 
     home_path = Path(hermes_home or os.getenv("HERMES_HOME", Path.home() / ".hermes"))
-    env_override = os.getenv("HERMES_ENV_PATH", "").strip()
-    if env_override:
-        user_env = Path(env_override).expanduser()
-    else:
-        user_env = home_path / ".env"
-        try:
-            from hermes_constants import get_env_path, get_hermes_home
-
-            if home_path.expanduser().resolve() == get_hermes_home().expanduser().resolve():
-                user_env = get_env_path()
-        except Exception:
-            pass
+    user_env = home_path / ".env"
     project_env_path = Path(project_env) if project_env else None
 
     # Fix corrupted .env files before python-dotenv parses them (#8908).
